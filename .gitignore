@@ -199,8 +199,8 @@ dist
 /types
 /docs
 /dist
-/react-canvaskit/types/
-/react-canvaskit/docs/
+/types/
+/docs/
 /demos/paragraph-demo/src/react-app-env.d.ts
 /demos/offscreen-paragraph-demo/build
 /.idea
