@@ -1,6 +1,6 @@
 {
   "name": "react-canvaskit",
-  "version": "0.0.1-alpha.8",
+  "version": "0.0.2",
   "description": "A React implementation of the Skia-CanvasKit drawing library.",
   "keywords": [
     "react",
@@ -30,22 +30,22 @@
     "test:prod": "yarn test -- --no-cache"
   },
   "dependencies": {
-    "react-reconciler": "0.26.2"
+    "react-reconciler": "0.29.0"
   },
   "peerDependencies": {
-    "canvaskit-wasm": "0.32.0",
-    "react": "17.0.2"
+    "canvaskit-wasm": "0.39.1",
+    "react": "18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^16.4.1",
-    "@types/react-reconciler": "^0.26.3",
-    "canvaskit-wasm": "0.32.0",
-    "prettier": "^2.5.1",
-    "react-devtools": "^4.14.0",
-    "rimraf": "^3.0.2",
-    "ts-jest": "^27.1.2",
-    "ts-node": "^10.1.0",
-    "typescript": "^4.3.5"
+    "@types/node": "^20.11.20",
+    "@types/react-reconciler": "^0.28.8",
+    "canvaskit-wasm": "0.39.1",
+    "prettier": "^3.2.5",
+    "react-devtools": "^5.0.0",
+    "rimraf": "^5.0.5",
+    "ts-jest": "^29.1.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   },
   "author": "Erik De Rijcke",
   "homepage": "https://github.com/udevbe/react-canvaskit",
