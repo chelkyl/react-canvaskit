@@ -1,9 +1,10 @@
-import type { Canvas as SkCanvas, CanvasKit, Paint as SkPaint, Surface as SkSurface } from 'canvaskit-wasm'
+import type { CanvasKit, Canvas as SkCanvas, Paint as SkPaint, Surface as SkSurface } from 'canvaskit-wasm'
 import type { ReactElement } from 'react'
+
 import type { CkCanvasProps } from './CkCanvas'
 import { isCkCanvas } from './CkCanvas'
 import { toSkPaint } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -12,7 +13,7 @@ import {
   Paint,
 } from './SkiaElementTypes'
 
-export interface CkSurfaceProps extends CkElementProps<SkSurface> {
+export type CkSurfaceProps = {
   width: number
   height: number
   dx?: number
@@ -20,27 +21,31 @@ export interface CkSurfaceProps extends CkElementProps<SkSurface> {
   paint?: Paint
 
   children?: ReactElement<CkCanvasProps> | ReactElement<CkCanvasProps>[]
-}
+} & CkElementProps<SkSurface>
 
 export class CkSurface implements CkElementContainer<'ck-surface'> {
-  readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-surface']['props']
   skObject?: CkObjectTyping['ck-surface']['type']
-  readonly skObjectType: CkObjectTyping['ck-surface']['name'] = 'SkSurface'
-  readonly type: 'ck-surface' = 'ck-surface'
+  get skObjectType(): CkObjectTyping['ck-surface']['name'] {
+    return 'SkSurface'
+  }
+  get type(): 'ck-surface' {
+    return 'ck-surface'
+  }
   children: CkElementContainer<'ck-canvas'>[] = []
+
+  deleted = false
 
   readonly defaultPaint: SkPaint
   private renderPaint?: SkPaint
-  deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-surface']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-surface']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
   }
 
-  render(parent: CkElementContainer<any>) {
+  render(parent: CkElementContainer<any>): void {
     if (this.deleted) {
       throw new Error('BUG. surface element deleted.')
     }
@@ -57,20 +62,11 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
       throw new Error('Expected an initialized ck-canvas as parent of ck-surface')
     }
 
-    this.children.forEach((child) => child.render(this))
+    for (const child of this.children) child.render(this)
     this.drawSelf(parent.skObject, this.skObject)
   }
 
-  private drawSelf(parent: SkCanvas, skSurface: SkSurface) {
-    const skImage = skSurface.makeImageSnapshot()
-    const { dx, dy, paint } = this.props
-    // TODO we can be smart and only recreate the paint object if the paint props have changed.
-    this.renderPaint?.delete()
-    this.renderPaint = toSkPaint(this.canvasKit, paint)
-    parent.drawImage(skImage, dx ?? 0, dy ?? 0, this.renderPaint ?? this.defaultPaint)
-  }
-
-  delete() {
+  delete(): void {
     if (this.deleted) {
       return
     }
@@ -81,15 +77,22 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
     this.skObject?.delete()
     this.skObject = undefined
   }
+
+  private drawSelf(parent: SkCanvas, skSurface: SkSurface): void {
+    const skImage = skSurface.makeImageSnapshot()
+    const { dx, dy, paint } = this.props
+    // TODO we can be smart and only recreate the paint object if the paint props have changed.
+    this.renderPaint?.delete()
+    this.renderPaint = toSkPaint(this.canvasKit, paint)
+    parent.drawImage(skImage, dx ?? 0, dy ?? 0, this.renderPaint ?? this.defaultPaint)
+  }
 }
 
 export const createCkSurface: CkElementCreator<'ck-surface'> = (
   type,
   props,
   canvasKit,
-): CkElementContainer<'ck-surface'> => {
-  return new CkSurface(canvasKit, props)
-}
+): CkElementContainer<'ck-surface'> => new CkSurface(canvasKit, props)
 
 export function isCkSurface(ckElement: CkElement<any>): ckElement is CkSurface {
   return ckElement.type === 'ck-surface'

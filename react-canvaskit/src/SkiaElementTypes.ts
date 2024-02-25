@@ -1,11 +1,12 @@
 import type {
-  Canvas as SkCanvas,
   CanvasKit,
+  Canvas as SkCanvas,
   Image as SkImage,
   Paragraph as SkParagraph,
   Surface as SkSurface,
 } from 'canvaskit-wasm'
 import type { MutableRefObject } from 'react'
+
 import type { CkCanvasProps } from './CkCanvas'
 import { createCkCanvas } from './CkCanvas'
 import type { CkEncodedImageProps } from './CkEncodedImage'
@@ -21,9 +22,10 @@ import { createCkText } from './CkText'
 
 export type CkElementProps<T> = {
   ref?: MutableRefObject<T | null | undefined>
+  renderCallback?: () => void
 }
 
-export interface CkObjectTyping {
+export type CkObjectTyping = {
   'ck-surface': { type: SkSurface; name: 'SkSurface'; props: CkSurfaceProps }
   'ck-canvas': { type: SkCanvas; name: 'SkCanvas'; props: CkCanvasProps }
   'ck-line': { type: never; name: 'Line'; props: CkLineProps }
@@ -34,38 +36,31 @@ export interface CkObjectTyping {
 
 export type CkElementType = keyof CkObjectTyping
 
-export interface CkElement<TypeName extends keyof CkObjectTyping> {
+export type CkElement<TypeName extends CkElementType> = {
   readonly canvasKit: CanvasKit
   readonly type: TypeName
   props: CkObjectTyping[TypeName]['props']
   readonly skObjectType: CkObjectTyping[TypeName]['name']
   skObject?: CkObjectTyping[TypeName]['type']
 
-  render(parent: CkElementContainer<any>): void
+  render(parent: CkElementContainer<CkElementType>): void
 
   delete(): void
 }
 
-export interface CkElementCreator<TypeName extends keyof CkObjectTyping> {
+export type CkElementCreator<TypeName extends CkElementType> = {
   (type: TypeName, props: CkObjectTyping[TypeName]['props'], canvasKit: CanvasKit): CkElement<TypeName>
 }
 
-export function isContainerElement(ckElement: CkElement<any>): ckElement is CkElementContainer<any> {
-  return (ckElement as CkElementContainer<any>).children !== undefined
+export function isContainerElement(
+  ckElement: CkElement<CkElementType>,
+): ckElement is CkElementContainer<CkElementType> {
+  return (ckElement as CkElementContainer<CkElementType>).children !== undefined
 }
 
-export interface CkElementContainer<TypeName extends keyof CkObjectTyping> extends CkElement<TypeName> {
-  children: CkElement<any>[]
-}
-
-namespace CkPropTypes {
-  export const Color = {
-    red: 'number',
-    green: 'number',
-    blue: 'number',
-    alpha: 'number',
-  }
-}
+export type CkElementContainer<TypeName extends CkElementType> = {
+  children: Array<CkElement<CkElementType>>
+} & CkElement<TypeName>
 
 export interface Color {
   red: number
@@ -75,9 +70,6 @@ export interface Color {
 }
 
 export type ColorTypeName = 'Color'
-
-export enum FilterQuality {}
-// TODO
 
 export enum StrokeCap {}
 // TODO
@@ -366,22 +358,22 @@ export enum FontWidthEnum {
   UltraExpanded = 9,
 }
 
-export interface TypeFace {
+export type TypeFace = {
   data: ArrayBuffer
 }
 
-export interface Font {
+export type Font = {
   typeFace?: TypeFace
   size: number
 }
 
-export interface CkFontStyle {
+export type CkFontStyle = {
   weight?: FontWeightEnum
   slant?: FontSlantEnum
   width?: FontWidthEnum
 }
 
-export interface TextStyle {
+export type TextStyle = {
   backgroundColor?: Color | string
   color?: Color | string
   decoration?: number
@@ -392,7 +384,7 @@ export interface TextStyle {
   foregroundColor?: Color | string
 }
 
-export interface ParagraphStyle {
+export type ParagraphStyle = {
   disableHinting?: boolean
   heightMultiplier?: number
   ellipsis?: string
@@ -402,14 +394,14 @@ export interface ParagraphStyle {
   textStyle: TextStyle
 }
 
-export interface ParagraphProps {
+export type ParagraphProps = {
   style: ParagraphStyle
   maxWidth: number
   x: number
   y: number
 }
 
-const CkElements: { [key in CkElementType]: CkElementCreator<any> } = {
+const CkElements: { [TypeName in CkElementType]: CkElementCreator<TypeName> } = {
   'ck-text': createCkText,
   'ck-line': createCkLine,
   'ck-surface': createCkSurface,
@@ -418,12 +410,16 @@ const CkElements: { [key in CkElementType]: CkElementCreator<any> } = {
   'ck-encoded-image': createCkEncodedImage,
 }
 
-export function createCkElement(type: CkElementType, props: CkElementProps<any>, canvasKit: CanvasKit): CkElement<any> {
+export function createCkElement<TypeName extends CkElementType>(
+  type: TypeName,
+  props: CkObjectTyping[TypeName]['props'],
+  canvasKit: CanvasKit,
+): CkElement<TypeName> {
   return CkElements[type](type, props, canvasKit)
 }
 
 declare global {
-  namespace JSX {
+  namespace React.JSX {
     interface IntrinsicElements {
       'ck-text': CkTextProps
       'ck-canvas': CkCanvasProps

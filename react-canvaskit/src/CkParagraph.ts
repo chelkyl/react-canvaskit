@@ -1,12 +1,8 @@
-import type {
-  CanvasKit,
-  FontMgr as SkFontManager,
-  Paragraph as SkParagraph,
-  ParagraphStyle as SkParagraphStyle,
-} from 'canvaskit-wasm'
+import type { CanvasKit, FontMgr as SkFontManager, Paragraph as SkParagraph } from 'canvaskit-wasm'
+
 import { isCkCanvas } from './CkCanvas'
 import { toSkParagraphStyle } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -15,27 +11,30 @@ import {
   ParagraphStyle,
 } from './SkiaElementTypes'
 
-export interface CkParagraphProps extends ParagraphStyle, CkElementProps<SkParagraph> {
+export type CkParagraphProps = {
   layout: number
   fontManager: SkFontManager
   x?: number
   y?: number
   children?: string
-}
+} & ParagraphStyle &
+  CkElementProps<SkParagraph>
 
 class CkParagraph implements CkElement<'ck-paragraph'> {
-  readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-paragraph']['props']
   skObject?: CkObjectTyping['ck-paragraph']['type']
-  readonly skObjectType: CkObjectTyping['ck-paragraph']['name'] = 'SkParagraph'
-  readonly type: 'ck-paragraph' = 'ck-paragraph'
+  get skObjectType(): CkObjectTyping['ck-paragraph']['name'] {
+    return 'SkParagraph'
+  }
+  get type(): 'ck-paragraph' {
+    return 'ck-paragraph'
+  }
 
   deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-paragraph']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
-  }
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-paragraph']['props'],
+  ) {}
 
   render(parent: CkElementContainer<any>): void {
     if (this.deleted) {
@@ -43,7 +42,7 @@ class CkParagraph implements CkElement<'ck-paragraph'> {
     }
 
     const skParagraphBuilder = this.canvasKit.ParagraphBuilder.Make(
-      <SkParagraphStyle>toSkParagraphStyle(this.canvasKit, this.props),
+      toSkParagraphStyle(this.canvasKit, this.props)!,
       this.props.fontManager,
     )
     if (this.props.children) {
@@ -58,7 +57,7 @@ class CkParagraph implements CkElement<'ck-paragraph'> {
     // TODO we can avoid deleting & recreating the paragraph skobject by checkin props that require a new paragraph instance.
   }
 
-  delete() {
+  delete(): void {
     if (this.deleted) {
       return
     }

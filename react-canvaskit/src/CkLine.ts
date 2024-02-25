@@ -1,7 +1,8 @@
 import type { CanvasKit, Paint as SkPaint } from 'canvaskit-wasm'
+
 import { isCkCanvas } from './CkCanvas'
 import { toSkPaint } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -10,23 +11,31 @@ import {
   Paint,
 } from './SkiaElementTypes'
 
-export interface CkLineProps extends CkElementProps<never> {
+export type CkLineProps = {
   x1: number
   y1: number
   x2: number
   y2: number
   paint?: Paint
-}
+} & CkElementProps<never>
 
 class CkLine implements CkElement<'ck-line'> {
-  readonly skObjectType: CkObjectTyping['ck-line']['name'] = 'Line'
-  readonly type: 'ck-line' = 'ck-line'
+  get skObjectType(): CkObjectTyping['ck-line']['name'] {
+    return 'Line'
+  }
+  get type(): 'ck-line' {
+    return 'ck-line'
+  }
+
+  deleted = false
 
   private readonly defaultPaint: SkPaint
   private renderPaint?: SkPaint
-  deleted = false
 
-  constructor(readonly canvasKit: CanvasKit, readonly props: CkObjectTyping['ck-line']['props']) {
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-line']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
@@ -50,7 +59,7 @@ class CkLine implements CkElement<'ck-line'> {
     }
   }
 
-  delete() {
+  delete(): void {
     if (this.deleted) {
       return
     }

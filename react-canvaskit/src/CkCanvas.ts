@@ -1,8 +1,9 @@
 import type { Canvas as SkCanvas, CanvasKit } from 'canvaskit-wasm'
 import type { ReactNode } from 'react'
+
 import { isCkSurface } from './CkSurface'
 import { toSkColor } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -11,28 +12,31 @@ import {
   Color,
 } from './SkiaElementTypes'
 
-export interface CkCanvasProps extends CkElementProps<SkCanvas> {
+export type CkCanvasProps = {
   clear?: Color | string
   rotate?: { degree: number; px?: number; py?: number }
   children?: ReactNode
-}
+} & CkElementProps<SkCanvas>
 
 type CkCanvasChild = CkElement<'ck-surface'> | CkElement<'ck-text'>
 
 export class CkCanvas implements CkElementContainer<'ck-canvas'> {
-  readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-canvas']['props']
   skObject?: CkObjectTyping['ck-canvas']['type']
-  readonly skObjectType: CkObjectTyping['ck-canvas']['name'] = 'SkCanvas'
-  readonly type: 'ck-canvas' = 'ck-canvas'
+  get skObjectType(): CkObjectTyping['ck-canvas']['name'] {
+    return 'SkCanvas'
+  }
+  get type(): 'ck-canvas' {
+    return 'ck-canvas'
+  }
+
   children: CkCanvasChild[] = []
 
   private deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-canvas']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
-  }
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-canvas']['props'],
+  ) {}
 
   render(parent: CkElementContainer<any>): void {
     if (this.deleted) {
@@ -49,12 +53,22 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
 
     this.skObject.save()
     this.drawSelf(this.skObject)
-    this.children.forEach((child) => child.render(this))
+    for (const child of this.children) child.render(this)
     this.skObject.restore()
     parent.skObject?.flush()
   }
 
-  private drawSelf(skCanvas: SkCanvas) {
+  delete(): void {
+    if (this.deleted) {
+      return
+    }
+    this.deleted = true
+    // The canvas object is 1-to-1 linked to the parent surface object, so deleting it means we could never recreate it.
+    // this.skObject?.delete()
+    this.skObject = undefined
+  }
+
+  private drawSelf(skCanvas: SkCanvas): void {
     const skColor = toSkColor(this.canvasKit, this.props.clear)
     if (skColor) {
       skCanvas.clear(skColor)
@@ -64,16 +78,6 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
       const { degree, px, py } = this.props.rotate
       skCanvas.rotate(degree, px ?? 0, py ?? 0)
     }
-  }
-
-  delete() {
-    if (this.deleted) {
-      return
-    }
-    this.deleted = true
-    // The canvas object is 1-to-1 linked to the parent surface object, so deleting it means we could never recreate it.
-    // this.skObject?.delete()
-    this.skObject = undefined
   }
 }
 

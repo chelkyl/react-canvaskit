@@ -1,7 +1,8 @@
 import { CanvasKit, Image as SkImage, Paint as SkPaint } from 'canvaskit-wasm'
+
 import { isCkCanvas } from './CkCanvas'
 import { toSkPaint } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -10,16 +11,21 @@ import {
   Paint,
 } from './SkiaElementTypes'
 
-export interface CkEncodedImageProps extends CkElementProps<never> {
+export type CkEncodedImageProps = {
   left: number
   top: number
   bytes: Uint8Array | ArrayBuffer
   paint?: Paint
-}
+} & CkElementProps<never>
 
 class CkEncodedImage implements CkElement<'ck-encoded-image'> {
-  readonly skObjectType: CkObjectTyping['ck-encoded-image']['name'] = 'SkImage'
-  readonly type: 'ck-encoded-image' = 'ck-encoded-image'
+  get skObjectType(): CkObjectTyping['ck-encoded-image']['name'] {
+    return 'SkImage'
+  }
+  get type(): 'ck-encoded-image' {
+    return 'ck-encoded-image'
+  }
+
   deleted = false
 
   private readonly defaultPaint: SkPaint
@@ -27,7 +33,10 @@ class CkEncodedImage implements CkElement<'ck-encoded-image'> {
 
   private image?: SkImage
 
-  constructor(readonly canvasKit: CanvasKit, readonly props: CkObjectTyping['ck-encoded-image']['props']) {
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-encoded-image']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)

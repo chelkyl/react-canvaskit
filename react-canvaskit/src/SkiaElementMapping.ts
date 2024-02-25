@@ -1,19 +1,18 @@
 import type {
   CanvasKit,
+  FontStyle,
   Color as SkColor,
   Font as SkFont,
-  FontStyle,
   Paint as SkPaint,
   ParagraphStyle as SkParagraphStyle,
   TextStyle as SkTextStyle,
   Typeface as SkTypeface,
 } from 'canvaskit-wasm'
+
 import type { CkFontStyle, Color, Font, Paint, ParagraphStyle, TextStyle, TypeFace } from './SkiaElementTypes'
 import { FontSlantEnum, FontWeightEnum, FontWidthEnum } from './SkiaElementTypes'
 
-export interface PropsConverter<IN, OUT> {
-  (canvasKit: CanvasKit, propIn?: IN): OUT | undefined
-}
+export type PropsConverter<IN, OUT> = (canvasKit: CanvasKit, propIn?: IN) => OUT | undefined
 
 export const toSkTypeFace: PropsConverter<TypeFace, SkTypeface> = (canvasKit, typeFace) =>
   typeFace ? canvasKit.Typeface.MakeFreeTypeFaceFromData(typeFace.data) ?? undefined : undefined
@@ -23,16 +22,14 @@ export const toSkFont: PropsConverter<Font, SkFont> = (canvasKit, font) =>
     : undefined
 export const toSkColor: PropsConverter<Color | string, SkColor> = (canvasKit, color) => {
   if (typeof color === 'string') {
-    // @ts-ignore
-    return <SkColor>canvasKit.parseColorString(color)
-  } else {
-    return color ? canvasKit.Color(color.red, color.green, color.blue, color.alpha ?? 1) : undefined
+    return canvasKit.parseColorString(color)
   }
+  return color ? canvasKit.Color(color.red, color.green, color.blue, color.alpha ?? 1) : undefined
 }
 
 export const toSkPaint: PropsConverter<Paint, SkPaint> = (canvasKit, paint) => {
   if (paint === undefined) {
-    return undefined
+    return
   }
 
   const skPaint = new canvasKit.Paint()
@@ -67,26 +64,22 @@ export const toSkPaint: PropsConverter<Paint, SkPaint> = (canvasKit, paint) => {
   return skPaint
 }
 
-export const toFontStyle: PropsConverter<CkFontStyle, FontStyle> = (canvasKit, fontStyle): FontStyle => {
-  return {
-    slant: { value: fontStyle?.slant ?? FontSlantEnum.Upright },
-    weight: { value: fontStyle?.weight ?? FontWeightEnum.Normal },
-    width: { value: fontStyle?.width ?? FontWidthEnum.Normal },
-  }
-}
+export const toFontStyle: PropsConverter<CkFontStyle, FontStyle> = (canvasKit, fontStyle): FontStyle => ({
+  slant: { value: fontStyle?.slant ?? FontSlantEnum.Upright },
+  weight: { value: fontStyle?.weight ?? FontWeightEnum.Normal },
+  width: { value: fontStyle?.width ?? FontWidthEnum.Normal },
+})
 
-export const toSkTextStyle: PropsConverter<TextStyle, SkTextStyle> = (canvasKit, textStyle) => {
-  return {
-    backgroundColor: toSkColor(canvasKit, textStyle?.backgroundColor) ?? canvasKit.WHITE,
-    color: toSkColor(canvasKit, textStyle?.color) ?? canvasKit.BLACK,
-    decoration: textStyle?.decoration ?? 0,
-    decorationThickness: textStyle?.decorationThickness ?? 0,
-    fontFamilies: textStyle?.fontFamilies ?? [],
-    fontSize: textStyle?.fontSize ?? 14,
-    fontStyle: <FontStyle>toFontStyle(canvasKit, textStyle?.fontStyle),
-    foregroundColor: toSkColor(canvasKit, textStyle?.foregroundColor) ?? canvasKit.BLACK,
-  }
-}
+export const toSkTextStyle: PropsConverter<TextStyle, SkTextStyle> = (canvasKit, textStyle) => ({
+  backgroundColor: toSkColor(canvasKit, textStyle?.backgroundColor) ?? canvasKit.WHITE,
+  color: toSkColor(canvasKit, textStyle?.color) ?? canvasKit.BLACK,
+  decoration: textStyle?.decoration ?? 0,
+  decorationThickness: textStyle?.decorationThickness ?? 0,
+  fontFamilies: textStyle?.fontFamilies ?? [],
+  fontSize: textStyle?.fontSize ?? 14,
+  fontStyle: toFontStyle(canvasKit, textStyle?.fontStyle),
+  foregroundColor: toSkColor(canvasKit, textStyle?.foregroundColor) ?? canvasKit.BLACK,
+})
 
 export const toSkParagraphStyle: PropsConverter<ParagraphStyle, SkParagraphStyle> = (canvasKit, paragraphStyle) => {
   const textAlign = paragraphStyle?.textAlign ? { value: paragraphStyle.textAlign } : undefined
@@ -98,6 +91,6 @@ export const toSkParagraphStyle: PropsConverter<ParagraphStyle, SkParagraphStyle
     maxLines: paragraphStyle?.maxLines,
     textAlign,
     textDirection,
-    textStyle: <SkTextStyle>toSkTextStyle(canvasKit, paragraphStyle?.textStyle),
+    textStyle: toSkTextStyle(canvasKit, paragraphStyle?.textStyle),
   })
 }

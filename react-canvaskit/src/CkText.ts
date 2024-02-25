@@ -1,7 +1,8 @@
 import type { CanvasKit, Font as SkFont, Paint as SkPaint } from 'canvaskit-wasm'
+
 import { isCkCanvas } from './CkCanvas'
 import { toSkFont, toSkPaint } from './SkiaElementMapping'
-import {
+import type {
   CkElement,
   CkElementContainer,
   CkElementCreator,
@@ -11,31 +12,34 @@ import {
   Paint,
 } from './SkiaElementTypes'
 
-export interface CkTextProps extends CkElementProps<never> {
+export type CkTextProps = {
   x?: number
   y?: number
   paint?: Paint
   font?: Font
   children: string
-}
+} & CkElementProps<never>
 
 class CkText implements CkElement<'ck-text'> {
-  readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-text']['props']
-  readonly skObjectType: CkObjectTyping['ck-text']['name'] = 'Text'
-  readonly type: 'ck-text' = 'ck-text'
+  get skObjectType(): CkObjectTyping['ck-text']['name'] {
+    return 'Text'
+  }
+  get type(): 'ck-text' {
+    return 'ck-text'
+  }
+
+  deleted = false
 
   private readonly defaultPaint: SkPaint
   private readonly defaultFont: SkFont
 
   private renderPaint?: SkPaint
   private renderFont?: SkFont
-  deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-text']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
-
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-text']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
@@ -61,7 +65,7 @@ class CkText implements CkElement<'ck-text'> {
     }
   }
 
-  delete() {
+  delete(): void {
     if (this.deleted) {
       return
     }
