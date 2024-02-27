@@ -1,5 +1,6 @@
 import type { CanvasKit, FontMgr as SkFontManager } from 'canvaskit-wasm'
 import CanvasKitInit from 'canvaskit-wasm'
+import React from 'react'
 import type { FunctionComponent, ReactNode } from 'react'
 import type { HostConfig } from 'react-reconciler'
 import ReactReconciler from 'react-reconciler'
@@ -21,7 +22,7 @@ let canvasKit: CanvasKit | undefined
 
 let CanvasKitContext: React.Context<CanvasKit>
 export let useCanvasKit: () => CanvasKit
-export let CanvasKitProvider: FunctionComponent
+export let CanvasKitProvider: FunctionComponent<{ children?: ReactNode }>
 
 let FontManagerContext: React.Context<SkFontManager>
 export let useFontManager: () => SkFontManager
@@ -36,7 +37,6 @@ export async function init(): Promise<void> {
   CanvasKitContext = React.createContext(ck)
   useCanvasKit = () => React.useContext(CanvasKitContext)
   CanvasKitProvider = ({ children }) => {
-    // @ts-ignore
     return <CanvasKitContext.Provider value={ck}>{children}</CanvasKitContext.Provider>
   }
 
@@ -50,10 +50,8 @@ export async function init(): Promise<void> {
         throw new Error('Failed to create font manager from font data.')
       }
 
-      // @ts-ignore
       return <FontManagerContext.Provider value={fontMgrFromData}>{props.children}</FontManagerContext.Provider>
     }
-    // @ts-ignore
     return <FontManagerContext.Provider value={defaultFontManager}>{props.children}</FontManagerContext.Provider>
   }
 }
