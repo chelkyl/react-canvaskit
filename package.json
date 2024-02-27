@@ -27,8 +27,7 @@
     "build": "tsc",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
-    "test:prod": "yarn test -- --no-cache",
-    "prepare": "relative-deps"
+    "test:prod": "yarn test -- --no-cache"
   },
   "dependencies": {
     "react-reconciler": "0.29.0"
@@ -58,6 +57,5 @@
   },
   "engines": {
     "node": ">=14.0.0"
-  },
-  "relativeDependencies": {}
+  }
 }

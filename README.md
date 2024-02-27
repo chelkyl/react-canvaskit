@@ -8,9 +8,11 @@ This implementation allows you to use familiar React concepts like hooks and con
 
 # Examples
 
+Before running the examples in the demos folder, run `npm install` in the root of the repo first!
+
 #### Paragraph with dynamic font loading
 
-![Alt text](/demos/paragraph-demo/paragraph-demo.gif?raw=true "Paragraph Demo")
+![Alt text](/demos/paragraph-demo/paragraph-demo.gif?raw=true 'Paragraph Demo')
 
 ```typescript jsx
 import type { FunctionComponent } from "react";
@@ -94,7 +96,7 @@ export default () => {
 
 #### Simple Paint
 
-![Alt text](/demos/simple-paint/hello-react-canvaskit.png?raw=true "Hello React-CanvasKit!")
+![Alt text](/demos/simple-paint/hello-react-canvaskit.png?raw=true 'Hello React-CanvasKit!')
 
 ```typescript jsx
 const App: FunctionComponent = () => {

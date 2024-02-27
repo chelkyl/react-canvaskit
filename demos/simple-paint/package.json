@@ -5,14 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc --build && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "prepare": "relative-deps"
+    "preview": "vite preview"
   },
   "dependencies": {
     "canvaskit-wasm": "0.39.1",
     "react": "^18.2.0",
+    "react-canvaskit": "file:../../",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
@@ -24,11 +24,7 @@
     "eslint": "^8.56.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "relative-deps": "^1.0.7",
     "typescript": "^5.2.2",
     "vite": "^5.1.4"
-  },
-  "relativeDependencies": {
-    "react-canvaskit": "../../"
   }
 }
