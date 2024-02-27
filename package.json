@@ -27,7 +27,8 @@
     "build": "tsc",
     "test": "jest --coverage",
     "test:watch": "jest --coverage --watch",
-    "test:prod": "yarn test -- --no-cache"
+    "test:prod": "yarn test -- --no-cache",
+    "prepare": "relative-deps"
   },
   "dependencies": {
     "react-reconciler": "0.29.0"
@@ -42,6 +43,7 @@
     "canvaskit-wasm": "0.39.1",
     "prettier": "^3.2.5",
     "react-devtools": "^5.0.0",
+    "relative-deps": "^1.0.7",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
@@ -56,5 +58,6 @@
   },
   "engines": {
     "node": ">=14.0.0"
-  }
+  },
+  "relativeDependencies": {}
 }

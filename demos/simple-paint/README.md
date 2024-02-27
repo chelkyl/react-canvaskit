@@ -1,4 +1,7 @@
 # Build
-- `yarn install`
+
+- `npm install`
+
 # Run
-- `yarn start`
+
+- `npm run dev`
