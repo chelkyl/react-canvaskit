@@ -1,11 +1,11 @@
 # Build
-- `yarn install`
+
+- `npm install && npm run build`
+
 # Run
-- `yarn start`
 
- Create-react-app has a bug with babel-loader processing node_modules, so running a dev server might fail. If this is
-the case for you, you can try doing a production build instead.
+- `npm run dev`
 
-- `yarn build`
-- `yarn global add serve`
-- `serve -s build`
+_Something_ may cause an issue in dev mode (possibly related to hot refreshes) where the worker (specifically `useAnimationFrame.tsx`) will error with `Uncaught ReferenceError: $RefreshSig$ is not defined`. If this is the case for you, you can try doing a production build instead.
+
+- `npm run preview`
