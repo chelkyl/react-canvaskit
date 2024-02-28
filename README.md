@@ -6,7 +6,20 @@ Experimental implementation of [Skia CanvasKit](https://skia.org/user/modules/ca
 
 This implementation allows you to use familiar React concepts like hooks and contexts, in conjunction with JSX elements that closely match the existing Skia CanvasKit API. Everything is drawn to a hardware-accelerated WebGL canvas.
 
-# Examples
+## Usage
+
+Note: do not use @vitejs/plugin-react-swc because it causes the following warning and error for yet-to-be-determined reasons:
+
+```
+Warning: Invalid hook call. Hooks can only be called inside of the body of a function component. This could happen for one of the following reasons:
+1. You might have mismatching versions of React and the renderer (such as React DOM)
+2. You might be breaking the Rules of Hooks
+3. You might have more than one copy of React in the same app
+
+Uncaught TypeError: Cannot read properties of null (reading 'useState')
+```
+
+### Examples
 
 Before running the examples in the demos folder, run `npm install` in the root of the repo first!
 
