@@ -18,7 +18,11 @@
     "composite": true,
 
     /* Linting */
-    "strict": true
+    "strict": true,
+
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "allowJs": true
   },
   "include": ["src"]
 }

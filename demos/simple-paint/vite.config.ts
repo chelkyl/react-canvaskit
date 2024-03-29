@@ -6,5 +6,8 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: ['ES2022'],
+    rollupOptions: {
+      external: ['react-reconciler/constants'],
+    },
   },
 })

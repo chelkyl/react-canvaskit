@@ -30,23 +30,22 @@
     "test:prod": "yarn test -- --no-cache"
   },
   "dependencies": {
-    "react-reconciler": "0.29.0"
+    "react-reconciler": "0.26.2"
   },
   "peerDependencies": {
-    "canvaskit-wasm": "0.39.1",
-    "react": "18.2.0"
+    "canvaskit-wasm": "0.32.0",
+    "react": "17.0.2"
   },
   "devDependencies": {
-    "@types/node": "^20.11.20",
-    "@types/react-reconciler": "^0.28.8",
-    "canvaskit-wasm": "0.39.1",
+    "@types/node": "^16.4.1",
+    "@types/react-reconciler": "^0.26.3",
+    "canvaskit-wasm": "0.32.0",
     "prettier": "^3.2.5",
-    "react-devtools": "^5.0.0",
-    "relative-deps": "^1.0.7",
+    "react-devtools": "^4.14.0",
     "rimraf": "^5.0.5",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^4.3.5"
   },
   "author": "Erik De Rijcke",
   "homepage": "https://github.com/udevbe/react-canvaskit",

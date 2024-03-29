@@ -14,8 +14,9 @@ const loadRobotoFontData = async (): Promise<ArrayBuffer> => {
   return response.arrayBuffer()
 }
 
+// @ts-ignore
 const canvasKitPromise: Promise<CanvasKit> = CanvasKitInit({
-  locateFile: (file: string): string => `https://unpkg.com/canvaskit-wasm@0.39.1/bin/${file}`,
+  locateFile: (file: string): string => `https://unpkg.com/canvaskit-wasm@0.32.0/bin/${file}`,
 })
 
 let canvasKit: CanvasKit | undefined
@@ -88,6 +89,11 @@ type ReactCanvasKitHostConfig<
 
 // TODO implement missing functions
 const hostConfig: ReactCanvasKitHostConfig<CkElementType> = {
+  /**
+   * This function is used by the reconciler in order to calculate current time for prioritising work.
+   */
+  now: Date.now,
+
   // -------------------
   //        Modes
   // -------------------

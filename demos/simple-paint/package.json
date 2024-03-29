@@ -10,14 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "canvaskit-wasm": "0.39.1",
-    "react": "^18.2.0",
-    "react-canvaskit": "file:../../",
-    "react-dom": "^18.2.0"
+    "canvaskit-wasm": "0.32.0",
+    "react": "17.0.2",
+    "react-reconciler": "0.26.2",
+    "react-canvaskit": "file:../../"
   },
   "devDependencies": {
-    "@types/react": "^18.2.56",
-    "@types/react-dom": "^18.2.19",
+    "@types/react": "^17.0.38",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.2.1",

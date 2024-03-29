@@ -419,7 +419,7 @@ export function createCkElement<TypeName extends CkElementType>(
 }
 
 declare global {
-  namespace React.JSX {
+  namespace JSX {
     interface IntrinsicElements {
       'ck-text': CkTextProps
       'ck-canvas': CkCanvasProps
