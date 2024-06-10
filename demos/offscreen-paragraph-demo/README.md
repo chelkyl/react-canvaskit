@@ -1,11 +1,9 @@
-# Build
-- `yarn install`
-# Run
-- `yarn start`
+# Offscreen Paragraph Demo
 
- Create-react-app has a bug with babel-loader processing node_modules, so running a dev server might fail. If this is
-the case for you, you can try doing a production build instead.
+![Expected Result](../paragraph-demo/paragraph-demo.gif)
 
-- `yarn build`
-- `yarn global add serve`
-- `serve -s build`
+1. Build the core library first
+2. `npm install`
+3. `npm run dev`
+
+Note that hot module reloading is disabled. Otherwise, the web worker will error with `Uncaught ReferenceError: $RefreshSig$ is not defined`. Exact cause (other than something with vite/rollup hmr interaction with react-refresh in web workers) and fix unknown.

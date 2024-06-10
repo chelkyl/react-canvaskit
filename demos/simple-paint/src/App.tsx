@@ -1,5 +1,4 @@
 import type { FunctionComponent } from "react";
-import React from "react";
 
 export const App: FunctionComponent = () => {
   return (

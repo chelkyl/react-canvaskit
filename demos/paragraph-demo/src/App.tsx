@@ -1,6 +1,6 @@
-import type { FunctionComponent } from "react";
-import React from "react";
+import React, { useEffect } from "react";
 import { FontManagerProvider } from "react-canvaskit";
+
 import ParagraphDemo from "./ParagraphDemo";
 
 const robotoPromise = fetch(
@@ -12,15 +12,24 @@ const notoColorEmojiPromise = fetch(
 
 const fontsPromise = Promise.all([robotoPromise, notoColorEmojiPromise]);
 
-export const App: FunctionComponent = () => {
+function App() {
   const [fonts, setFonts] = React.useState<ArrayBuffer[] | undefined>(
     undefined
   );
-  fontsPromise.then((fetchedFonts) => setFonts(fetchedFonts));
+
+  useEffect(() => {
+    async function fetchFonts() {
+      const fetchedFonts = await fontsPromise;
+      setFonts(fetchedFonts);
+    }
+    fetchFonts();
+  }, []);
 
   return (
     <FontManagerProvider fontData={fonts}>
       <ParagraphDemo />
     </FontManagerProvider>
   );
-};
+}
+
+export default App;

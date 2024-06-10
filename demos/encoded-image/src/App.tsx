@@ -1,9 +1,9 @@
 import type { FunctionComponent } from "react";
-import React, { useState } from "react";
+import { useState } from "react";
 
-const imageDataPromise = fetch(
-  "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/PNG_Test.png/191px-PNG_Test.png"
-).then((resp) => resp.arrayBuffer());
+const imageDataPromise = fetch("/png-test.png").then((resp) =>
+  resp.arrayBuffer()
+);
 
 export const App: FunctionComponent = () => {
   const [imageBytes, setImageBytes] = useState<ArrayBuffer | null>(null);
