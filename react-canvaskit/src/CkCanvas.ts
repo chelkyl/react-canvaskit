@@ -7,6 +7,7 @@ import {
   CkElementContainer,
   CkElementCreator,
   CkElementProps,
+  CkElementType,
   CkObjectTyping,
   Color,
 } from './SkiaElementTypes'
@@ -24,7 +25,7 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
   readonly props: CkObjectTyping['ck-canvas']['props']
   skObject?: CkObjectTyping['ck-canvas']['type']
   readonly skObjectType: CkObjectTyping['ck-canvas']['name'] = 'SkCanvas'
-  readonly type: 'ck-canvas' = 'ck-canvas'
+  readonly type = 'ck-canvas' as const
   children: CkCanvasChild[] = []
 
   private deleted = false
@@ -34,7 +35,7 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
     this.props = props
   }
 
-  render(parent: CkElementContainer<any>): void {
+  render(parent: CkElementContainer<CkElementType>): void {
     if (this.deleted) {
       throw new Error('BUG. canvas element deleted.')
     }
@@ -77,7 +78,7 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
   }
 }
 
-export function isCkCanvas(ckElement: CkElement<any>): ckElement is CkCanvas {
+export function isCkCanvas(ckElement: CkElement<CkElementType>): ckElement is CkCanvas {
   return ckElement.type === 'ck-canvas'
 }
 

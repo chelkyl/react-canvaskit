@@ -8,6 +8,7 @@ import {
   CkElementContainer,
   CkElementCreator,
   CkElementProps,
+  CkElementType,
   CkObjectTyping,
   Paint,
 } from './SkiaElementTypes'
@@ -27,7 +28,7 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
   readonly props: CkObjectTyping['ck-surface']['props']
   skObject?: CkObjectTyping['ck-surface']['type']
   readonly skObjectType: CkObjectTyping['ck-surface']['name'] = 'SkSurface'
-  readonly type: 'ck-surface' = 'ck-surface'
+  readonly type = 'ck-surface' as const
   children: CkElementContainer<'ck-canvas'>[] = []
 
   readonly defaultPaint: SkPaint
@@ -40,7 +41,7 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
     this.defaultPaint = new this.canvasKit.Paint()
   }
 
-  render(parent: CkElementContainer<any>) {
+  render(parent: CkElementContainer<CkElementType>) {
     if (this.deleted) {
       throw new Error('BUG. surface element deleted.')
     }
@@ -91,6 +92,6 @@ export const createCkSurface: CkElementCreator<'ck-surface'> = (
   return new CkSurface(canvasKit, props)
 }
 
-export function isCkSurface(ckElement: CkElement<any>): ckElement is CkSurface {
+export function isCkSurface(ckElement: CkElement<CkElementType>): ckElement is CkSurface {
   return ckElement.type === 'ck-surface'
 }

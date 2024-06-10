@@ -34,30 +34,33 @@ export interface CkObjectTyping {
 
 export type CkElementType = keyof CkObjectTyping
 
-export interface CkElement<TypeName extends keyof CkObjectTyping> {
+export interface CkElement<TypeName extends CkElementType> {
   readonly canvasKit: CanvasKit
   readonly type: TypeName
   props: CkObjectTyping[TypeName]['props']
   readonly skObjectType: CkObjectTyping[TypeName]['name']
   skObject?: CkObjectTyping[TypeName]['type']
 
-  render(parent: CkElementContainer<any>): void
+  render(parent: CkElementContainer<CkElementType>): void
 
   delete(): void
 }
 
-export interface CkElementCreator<TypeName extends keyof CkObjectTyping> {
+export interface CkElementCreator<TypeName extends CkElementType> {
   (type: TypeName, props: CkObjectTyping[TypeName]['props'], canvasKit: CanvasKit): CkElement<TypeName>
 }
 
-export function isContainerElement(ckElement: CkElement<any>): ckElement is CkElementContainer<any> {
-  return (ckElement as CkElementContainer<any>).children !== undefined
+export function isContainerElement<TypeName extends CkElementType>(
+  ckElement: CkElement<TypeName>,
+): ckElement is CkElementContainer<TypeName> {
+  return (ckElement as CkElementContainer<TypeName>).children !== undefined
 }
 
-export interface CkElementContainer<TypeName extends keyof CkObjectTyping> extends CkElement<TypeName> {
-  children: CkElement<any>[]
+export interface CkElementContainer<TypeName extends CkElementType> extends CkElement<TypeName> {
+  children: CkElement<CkElementType>[]
 }
 
+// eslint-disable-next-line @typescript-eslint/no-namespace, @typescript-eslint/no-unused-vars
 namespace CkPropTypes {
   export const Color = {
     red: 'number',
@@ -409,7 +412,7 @@ export interface ParagraphProps {
   y: number
 }
 
-const CkElements: { [key in CkElementType]: CkElementCreator<any> } = {
+const CkElements: { [key in CkElementType]: CkElementCreator<key> } = {
   'ck-text': createCkText,
   'ck-line': createCkLine,
   'ck-surface': createCkSurface,
@@ -418,11 +421,17 @@ const CkElements: { [key in CkElementType]: CkElementCreator<any> } = {
   'ck-encoded-image': createCkEncodedImage,
 }
 
-export function createCkElement(type: CkElementType, props: CkElementProps<any>, canvasKit: CanvasKit): CkElement<any> {
+export function createCkElement<TypeName extends CkElementType>(
+  type: TypeName,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  props: CkElementProps<any>,
+  canvasKit: CanvasKit,
+): CkElement<TypeName> {
   return CkElements[type](type, props, canvasKit)
 }
 
 declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
   namespace JSX {
     interface IntrinsicElements {
       'ck-text': CkTextProps

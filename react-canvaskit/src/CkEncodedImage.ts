@@ -6,6 +6,7 @@ import {
   CkElementContainer,
   CkElementCreator,
   CkElementProps,
+  CkElementType,
   CkObjectTyping,
   Paint,
 } from './SkiaElementTypes'
@@ -19,7 +20,7 @@ export interface CkEncodedImageProps extends CkElementProps<never> {
 
 class CkEncodedImage implements CkElement<'ck-encoded-image'> {
   readonly skObjectType: CkObjectTyping['ck-encoded-image']['name'] = 'SkImage'
-  readonly type: 'ck-encoded-image' = 'ck-encoded-image'
+  readonly type = 'ck-encoded-image' as const
   deleted = false
 
   private readonly defaultPaint: SkPaint
@@ -27,7 +28,10 @@ class CkEncodedImage implements CkElement<'ck-encoded-image'> {
 
   private image?: SkImage
 
-  constructor(readonly canvasKit: CanvasKit, readonly props: CkObjectTyping['ck-encoded-image']['props']) {
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-encoded-image']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
@@ -44,7 +48,7 @@ class CkEncodedImage implements CkElement<'ck-encoded-image'> {
     this.deleted = true
   }
 
-  render(parent: CkElementContainer<any>): void {
+  render(parent: CkElementContainer<CkElementType>): void {
     if (this.deleted) {
       throw new Error('BUG. line element deleted.')
     }

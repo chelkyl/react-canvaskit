@@ -6,6 +6,7 @@ import {
   CkElementContainer,
   CkElementCreator,
   CkElementProps,
+  CkElementType,
   CkObjectTyping,
   Paint,
 } from './SkiaElementTypes'
@@ -20,19 +21,22 @@ export interface CkLineProps extends CkElementProps<never> {
 
 class CkLine implements CkElement<'ck-line'> {
   readonly skObjectType: CkObjectTyping['ck-line']['name'] = 'Line'
-  readonly type: 'ck-line' = 'ck-line'
+  readonly type = 'ck-line' as const
 
   private readonly defaultPaint: SkPaint
   private renderPaint?: SkPaint
   deleted = false
 
-  constructor(readonly canvasKit: CanvasKit, readonly props: CkObjectTyping['ck-line']['props']) {
+  constructor(
+    readonly canvasKit: CanvasKit,
+    readonly props: CkObjectTyping['ck-line']['props'],
+  ) {
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
   }
 
-  render(parent: CkElementContainer<any>): void {
+  render(parent: CkElementContainer<CkElementType>): void {
     if (this.deleted) {
       throw new Error('BUG. line element deleted.')
     }

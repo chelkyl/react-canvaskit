@@ -11,6 +11,7 @@ import {
   CkElementContainer,
   CkElementCreator,
   CkElementProps,
+  CkElementType,
   CkObjectTyping,
   ParagraphStyle,
 } from './SkiaElementTypes'
@@ -28,7 +29,7 @@ class CkParagraph implements CkElement<'ck-paragraph'> {
   readonly props: CkObjectTyping['ck-paragraph']['props']
   skObject?: CkObjectTyping['ck-paragraph']['type']
   readonly skObjectType: CkObjectTyping['ck-paragraph']['name'] = 'SkParagraph'
-  readonly type: 'ck-paragraph' = 'ck-paragraph'
+  readonly type = 'ck-paragraph' as const
 
   deleted = false
 
@@ -37,7 +38,7 @@ class CkParagraph implements CkElement<'ck-paragraph'> {
     this.props = props
   }
 
-  render(parent: CkElementContainer<any>): void {
+  render(parent: CkElementContainer<CkElementType>): void {
     if (this.deleted) {
       throw new Error('BUG. paragraph element deleted.')
     }

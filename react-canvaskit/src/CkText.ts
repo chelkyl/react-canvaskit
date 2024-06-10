@@ -10,6 +10,7 @@ import {
   Font,
   Paint,
 } from './SkiaElementTypes'
+import type { CkElementType } from './SkiaElementTypes'
 
 export interface CkTextProps extends CkElementProps<never> {
   x?: number
@@ -23,7 +24,7 @@ class CkText implements CkElement<'ck-text'> {
   readonly canvasKit: CanvasKit
   readonly props: CkObjectTyping['ck-text']['props']
   readonly skObjectType: CkObjectTyping['ck-text']['name'] = 'Text'
-  readonly type: 'ck-text' = 'ck-text'
+  readonly type = 'ck-text' as const
 
   private readonly defaultPaint: SkPaint
   private readonly defaultFont: SkFont
@@ -43,7 +44,7 @@ class CkText implements CkElement<'ck-text'> {
     this.defaultFont = new this.canvasKit.Font(null, 14)
   }
 
-  render(parent?: CkElementContainer<any>): void {
+  render(parent?: CkElementContainer<CkElementType>): void {
     if (parent && isCkCanvas(parent)) {
       // TODO we can be smart and only recreate the paint object if the paint props have changed.
       this.renderPaint?.delete()

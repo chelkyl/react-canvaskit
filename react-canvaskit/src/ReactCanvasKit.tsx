@@ -1,9 +1,9 @@
 import type { CanvasKit, FontMgr as SkFontManager } from 'canvaskit-wasm'
-import * as CanvasKitInit from 'canvaskit-wasm'
-import type { FunctionComponent, ReactNode } from 'react'
-import * as React from 'react'
+import CanvasKitInit from 'canvaskit-wasm'
+import type { FunctionComponent, PropsWithChildren, ReactNode } from 'react'
+import React from 'react'
 import type { HostConfig } from 'react-reconciler'
-import * as ReactReconciler from 'react-reconciler'
+import ReactReconciler from 'react-reconciler'
 import {
   CkElement,
   CkElementContainer,
@@ -26,9 +26,16 @@ let CanvasKitContext: React.Context<CanvasKit>
 export let useCanvasKit: () => CanvasKit
 export let CanvasKitProvider: FunctionComponent
 
+export interface FontManagerProviderHOC<P = {}> extends FunctionComponent {
+  (props: PropsWithChildren<P>, context?: any): JSX.Element | null
+}
+
+export interface FontManagerProviderProps {
+  fontData: ArrayBuffer[] | undefined
+}
 let FontManagerContext: React.Context<SkFontManager>
 export let useFontManager: () => SkFontManager
-export let FontManagerProvider: FunctionComponent<{ fontData: ArrayBuffer[] | undefined; children?: ReactNode }>
+export let FontManagerProvider: FontManagerProviderHOC<FontManagerProviderProps>
 
 export async function init() {
   canvasKit = await canvasKitPromise
@@ -38,12 +45,12 @@ export async function init() {
 
   CanvasKitContext = React.createContext(ck)
   useCanvasKit = () => React.useContext(CanvasKitContext)
-  CanvasKitProvider = ({ children }) => <CanvasKitContext.Provider value={ck}>children</CanvasKitContext.Provider>
+  CanvasKitProvider = ({ children }) => <CanvasKitContext.Provider value={ck}>{children}</CanvasKitContext.Provider>
 
   const defaultFontManager = ck.FontMgr.FromData(robotoFontData) as SkFontManager
   FontManagerContext = React.createContext(defaultFontManager)
   useFontManager = () => React.useContext(FontManagerContext)
-  FontManagerProvider = (props: { fontData: ArrayBuffer[] | undefined; children?: ReactNode }) => {
+  FontManagerProvider = ((props: PropsWithChildren<FontManagerProviderProps>) => {
     if (props.fontData) {
       const fontMgrFromData = ck.FontMgr.FromData(...props.fontData)
       if (fontMgrFromData === null) {
@@ -51,10 +58,9 @@ export async function init() {
       }
 
       return <FontManagerContext.Provider value={fontMgrFromData}>{props.children}</FontManagerContext.Provider>
-    } else {
-      return <FontManagerContext.Provider value={defaultFontManager}>{props.children}</FontManagerContext.Provider>
     }
-  }
+    return <FontManagerContext.Provider value={defaultFontManager}>{props.children}</FontManagerContext.Provider>
+  }) as FontManagerProviderHOC<FontManagerProviderProps>
 }
 
 type ContainerContext = {

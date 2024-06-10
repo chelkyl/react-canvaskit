@@ -14,17 +14,15 @@ import { FontSlantEnum, FontWeightEnum, FontWidthEnum } from './SkiaElementTypes
 export interface PropsConverter<IN, OUT> {
   (canvasKit: CanvasKit, propIn?: IN): OUT | undefined
 }
-
 export const toSkTypeFace: PropsConverter<TypeFace, SkTypeface> = (canvasKit, typeFace) =>
   typeFace ? canvasKit.Typeface.MakeFreeTypeFaceFromData(typeFace.data) ?? undefined : undefined
 export const toSkFont: PropsConverter<Font, SkFont> = (canvasKit, font) =>
   font
-    ? new canvasKit.Font(font.typeFace === undefined ? null : toSkTypeFace(canvasKit, font.typeFace)!!, font.size)
+    ? new canvasKit.Font(font.typeFace === undefined ? null : toSkTypeFace(canvasKit, font.typeFace)!, font.size)
     : undefined
 export const toSkColor: PropsConverter<Color | string, SkColor> = (canvasKit, color) => {
   if (typeof color === 'string') {
-    // @ts-ignore
-    return <SkColor>canvasKit.parseColorString(color)
+    return canvasKit.parseColorString(color)
   } else {
     return color ? canvasKit.Color(color.red, color.green, color.blue, color.alpha ?? 1) : undefined
   }
