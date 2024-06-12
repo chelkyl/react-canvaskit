@@ -4,6 +4,7 @@ import type {
   Image as SkImage,
   Paragraph as SkParagraph,
   Surface as SkSurface,
+  Typeface as SkTypeface,
 } from 'canvaskit-wasm'
 import type { MutableRefObject } from 'react'
 import type { CkCanvasProps } from './CkCanvas'
@@ -23,6 +24,12 @@ export type CkElementProps<T> = {
   ref?: MutableRefObject<T | null | undefined>
 }
 
+export interface ContainerContext {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ckElement: CkElement<any>
+  defaultTypeface: SkTypeface
+}
+
 export interface CkObjectTyping {
   'ck-surface': { type: SkSurface; name: 'SkSurface'; props: CkSurfaceProps }
   'ck-canvas': { type: SkCanvas; name: 'SkCanvas'; props: CkCanvasProps }
@@ -35,6 +42,7 @@ export interface CkObjectTyping {
 export type CkElementType = keyof CkObjectTyping
 
 export interface CkElement<TypeName extends CkElementType> {
+  readonly context: ContainerContext
   readonly canvasKit: CanvasKit
   readonly type: TypeName
   props: CkObjectTyping[TypeName]['props']
@@ -47,7 +55,7 @@ export interface CkElement<TypeName extends CkElementType> {
 }
 
 export interface CkElementCreator<TypeName extends CkElementType> {
-  (type: TypeName, props: CkObjectTyping[TypeName]['props'], canvasKit: CanvasKit): CkElement<TypeName>
+  (type: TypeName, props: CkObjectTyping[TypeName]['props'], context: ContainerContext): CkElement<TypeName>
 }
 
 export function isContainerElement<TypeName extends CkElementType>(
@@ -425,9 +433,9 @@ export function createCkElement<TypeName extends CkElementType>(
   type: TypeName,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   props: CkElementProps<any>,
-  canvasKit: CanvasKit,
+  context: ContainerContext,
 ): CkElement<TypeName> {
-  return CkElements[type](type, props, canvasKit)
+  return CkElements[type](type, props, context)
 }
 
 declare global {

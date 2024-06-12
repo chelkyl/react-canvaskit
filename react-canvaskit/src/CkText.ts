@@ -1,4 +1,4 @@
-import type { CanvasKit, Font as SkFont, Paint as SkPaint } from 'canvaskit-wasm'
+import type { CanvasKit, Font as SkFont, Paint as SkPaint, Typeface as SkTypeface } from 'canvaskit-wasm'
 import { isCkCanvas } from './CkCanvas'
 import { toSkFont, toSkPaint } from './SkiaElementMapping'
 import {
@@ -7,6 +7,7 @@ import {
   CkElementCreator,
   CkElementProps,
   CkObjectTyping,
+  ContainerContext,
   Font,
   Paint,
 } from './SkiaElementTypes'
@@ -22,26 +23,29 @@ export interface CkTextProps extends CkElementProps<never> {
 
 class CkText implements CkElement<'ck-text'> {
   readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-text']['props']
   readonly skObjectType: CkObjectTyping['ck-text']['name'] = 'Text'
   readonly type = 'ck-text' as const
 
   private readonly defaultPaint: SkPaint
   private readonly defaultFont: SkFont
+  private readonly defaultTypeface: SkTypeface
 
   private renderPaint?: SkPaint
   private renderFont?: SkFont
   deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-text']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
+  constructor(
+    readonly context: ContainerContext,
+    readonly props: CkObjectTyping['ck-text']['props'],
+  ) {
+    this.canvasKit = context.ckElement.canvasKit
+    this.defaultTypeface = context.defaultTypeface
 
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
 
-    this.defaultFont = new this.canvasKit.Font(null, 14)
+    this.defaultFont = new this.canvasKit.Font(this.defaultTypeface, 14)
   }
 
   render(parent?: CkElementContainer<CkElementType>): void {
@@ -51,7 +55,7 @@ class CkText implements CkElement<'ck-text'> {
       this.renderPaint = toSkPaint(this.canvasKit, this.props.paint)
       // TODO we can be smart and only recreate the font object if the font props have changed.
       this.renderFont?.delete()
-      this.renderFont = toSkFont(this.canvasKit, this.props.font)
+      this.renderFont = toSkFont(this.canvasKit, this.props.font, this.defaultTypeface)
       parent.skObject?.drawText(
         this.props.children,
         this.props.x ?? 0,
@@ -74,4 +78,4 @@ class CkText implements CkElement<'ck-text'> {
   }
 }
 
-export const createCkText: CkElementCreator<'ck-text'> = (type, props, canvasKit) => new CkText(canvasKit, props)
+export const createCkText: CkElementCreator<'ck-text'> = (type, props, context) => new CkText(context, props)

@@ -1,6 +1,6 @@
 {
   "name": "react-canvaskit",
-  "version": "0.0.1-alpha.8",
+  "version": "0.0.1",
   "description": "A React implementation of the Skia-CanvasKit drawing library.",
   "keywords": [
     "react",
@@ -31,18 +31,18 @@
     "test:prod": "yarn test -- --no-cache"
   },
   "dependencies": {
-    "react-reconciler": "0.26.2"
+    "react-reconciler": "0.29.2"
   },
   "peerDependencies": {
-    "canvaskit-wasm": "0.32.0",
-    "react": "17.0.2"
+    "canvaskit-wasm": "0.39.1",
+    "react": "18.3.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^20.12.12",
-    "@types/react-reconciler": "0.26.6",
-    "canvaskit-wasm": "0.32.0",
+    "@types/react-reconciler": "0.28.8",
+    "canvaskit-wasm": "0.39.1",
     "eslint": "^8.57.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "^3.2.5",

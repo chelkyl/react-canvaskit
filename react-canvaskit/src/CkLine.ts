@@ -8,6 +8,7 @@ import {
   CkElementProps,
   CkElementType,
   CkObjectTyping,
+  ContainerContext,
   Paint,
 } from './SkiaElementTypes'
 
@@ -20,6 +21,7 @@ export interface CkLineProps extends CkElementProps<never> {
 }
 
 class CkLine implements CkElement<'ck-line'> {
+  readonly canvasKit: CanvasKit
   readonly skObjectType: CkObjectTyping['ck-line']['name'] = 'Line'
   readonly type = 'ck-line' as const
 
@@ -28,9 +30,10 @@ class CkLine implements CkElement<'ck-line'> {
   deleted = false
 
   constructor(
-    readonly canvasKit: CanvasKit,
+    readonly context: ContainerContext,
     readonly props: CkObjectTyping['ck-line']['props'],
   ) {
+    this.canvasKit = context.ckElement.canvasKit
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
@@ -64,4 +67,4 @@ class CkLine implements CkElement<'ck-line'> {
   }
 }
 
-export const createCkLine: CkElementCreator<'ck-line'> = (type, props, canvasKit) => new CkLine(canvasKit, props)
+export const createCkLine: CkElementCreator<'ck-line'> = (type, props, context) => new CkLine(context, props)

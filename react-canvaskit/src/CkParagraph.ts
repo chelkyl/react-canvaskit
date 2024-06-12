@@ -13,6 +13,7 @@ import {
   CkElementProps,
   CkElementType,
   CkObjectTyping,
+  ContainerContext,
   ParagraphStyle,
 } from './SkiaElementTypes'
 
@@ -26,16 +27,17 @@ export interface CkParagraphProps extends ParagraphStyle, CkElementProps<SkParag
 
 class CkParagraph implements CkElement<'ck-paragraph'> {
   readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-paragraph']['props']
   skObject?: CkObjectTyping['ck-paragraph']['type']
   readonly skObjectType: CkObjectTyping['ck-paragraph']['name'] = 'SkParagraph'
   readonly type = 'ck-paragraph' as const
 
   deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-paragraph']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
+  constructor(
+    readonly context: ContainerContext,
+    readonly props: CkObjectTyping['ck-paragraph']['props'],
+  ) {
+    this.canvasKit = context.ckElement.canvasKit
   }
 
   render(parent: CkElementContainer<CkElementType>): void {
@@ -68,8 +70,5 @@ class CkParagraph implements CkElement<'ck-paragraph'> {
   }
 }
 
-export const createCkParagraph: CkElementCreator<'ck-paragraph'> = (
-  type,
-  props,
-  canvasKit,
-): CkElement<'ck-paragraph'> => new CkParagraph(canvasKit, props)
+export const createCkParagraph: CkElementCreator<'ck-paragraph'> = (type, props, context): CkElement<'ck-paragraph'> =>
+  new CkParagraph(context, props)

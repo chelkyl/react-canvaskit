@@ -1,4 +1,4 @@
-import type { CanvasKit, FontMgr as SkFontManager } from 'canvaskit-wasm'
+import type { CanvasKit, FontMgr as SkFontManager, Typeface as SkTypeface } from 'canvaskit-wasm'
 import CanvasKitInit from 'canvaskit-wasm'
 import type { FunctionComponent, PropsWithChildren, ReactNode } from 'react'
 import React from 'react'
@@ -9,16 +9,18 @@ import {
   CkElementContainer,
   CkElementProps,
   CkElementType,
+  ContainerContext,
   createCkElement,
   isContainerElement,
 } from './SkiaElementTypes'
 
-const loadRobotoFontData = fetch('https://storage.googleapis.com/skia-cdn/misc/Roboto-Regular.ttf').then((response) =>
-  response.arrayBuffer(),
-)
+const loadNotoSansMonoFontData = fetch(
+  'https://storage.googleapis.com/skia-cdn/google-web-fonts/NotoSansMono-Regular.ttf',
+).then((response) => response.arrayBuffer())
+
 // @ts-ignore
 const canvasKitPromise: Promise<CanvasKit> = CanvasKitInit({
-  locateFile: (file: string): string => `https://unpkg.com/canvaskit-wasm@0.32.0/bin/${file}`,
+  locateFile: (file: string): string => `https://unpkg.com/canvaskit-wasm@0.39.1/bin/${file}`,
 })
 let canvasKit: CanvasKit | undefined
 
@@ -37,9 +39,11 @@ let FontManagerContext: React.Context<SkFontManager>
 export let useFontManager: () => SkFontManager
 export let FontManagerProvider: FontManagerProviderHOC<FontManagerProviderProps>
 
+export let defaultTypeface: SkTypeface
+
 export async function init() {
   canvasKit = await canvasKitPromise
-  const robotoFontData = await loadRobotoFontData
+  const notoSansMonoFontData = await loadNotoSansMonoFontData
   // const copy to make the TS compiler happy when we pass it down to a lambda
   const ck = canvasKit
 
@@ -47,7 +51,8 @@ export async function init() {
   useCanvasKit = () => React.useContext(CanvasKitContext)
   CanvasKitProvider = ({ children }) => <CanvasKitContext.Provider value={ck}>{children}</CanvasKitContext.Provider>
 
-  const defaultFontManager = ck.FontMgr.FromData(robotoFontData) as SkFontManager
+  defaultTypeface = ck.Typeface.MakeFreeTypeFaceFromData(notoSansMonoFontData) as SkTypeface
+  const defaultFontManager = ck.FontMgr.FromData(notoSansMonoFontData) as SkFontManager
   FontManagerContext = React.createContext(defaultFontManager)
   useFontManager = () => React.useContext(FontManagerContext)
   FontManagerProvider = ((props: PropsWithChildren<FontManagerProviderProps>) => {
@@ -61,10 +66,6 @@ export async function init() {
     }
     return <FontManagerContext.Provider value={defaultFontManager}>{props.children}</FontManagerContext.Provider>
   }) as FontManagerProviderHOC<FontManagerProviderProps>
-}
-
-type ContainerContext = {
-  ckElement: CkElement<any>
 }
 
 export interface SkObjectRef<T> {
@@ -90,10 +91,6 @@ interface ReactCanvasKitHostConfig
 
 // @ts-ignore TODO implement missing functions
 const hostConfig: ReactCanvasKitHostConfig = {
-  /**
-   * This function is used by the reconciler in order to calculate current time for prioritising work.
-   */
-  now: Date.now,
   supportsMutation: false,
   supportsPersistence: true,
   supportsHydration: false,
@@ -127,7 +124,7 @@ const hostConfig: ReactCanvasKitHostConfig = {
    * @return A context object that you wish to pass to immediate child.
    */
   getRootHostContext(rootContainerInstance): ContainerContext {
-    return { ckElement: rootContainerInstance }
+    return { ckElement: rootContainerInstance, defaultTypeface: defaultTypeface }
   },
 
   /**
@@ -224,7 +221,7 @@ const hostConfig: ReactCanvasKitHostConfig = {
    * @param internalInstanceHandle The fiber node for the text instance. This manages work for this instance.
    */
   createInstance(type, props, rootContainerInstance, hostContext, internalInstanceHandle) {
-    return createCkElement(type, props, hostContext.ckElement.canvasKit)
+    return createCkElement(type, props, hostContext)
   },
 
   /**
@@ -336,7 +333,7 @@ const hostConfig: ReactCanvasKitHostConfig = {
   ): CkElement<any> {
     // TODO implement a way where we can create a new instance and reuse the underlying canvaskit objects where possible
 
-    const ckElement = createCkElement(type, newProps, instance.canvasKit)
+    const ckElement = createCkElement(type, newProps, instance.context)
     if (keepChildren && isContainerElement(ckElement) && isContainerElement(instance)) {
       ckElement.children = instance.children
     }
@@ -378,7 +375,16 @@ export function render(element: ReactNode, canvas: HTMLCanvasElement, renderCall
       this.children.forEach((child) => child.render(ckSurfaceElement))
     },
   }
-  const container = canvaskitReconciler.createContainer(ckSurfaceElement, rootTag, hydrate, null)
+  const container = canvaskitReconciler.createContainer(
+    ckSurfaceElement,
+    rootTag,
+    null,
+    true,
+    null,
+    'app',
+    (error) => console.error(error),
+    null,
+  )
 
   return new Promise<void>((resolve) => {
     canvaskitReconciler.updateContainer(element, container, null, () => resolve())

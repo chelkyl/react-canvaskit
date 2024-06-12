@@ -10,6 +10,7 @@ import {
   CkElementProps,
   CkElementType,
   CkObjectTyping,
+  ContainerContext,
   Paint,
 } from './SkiaElementTypes'
 
@@ -25,7 +26,6 @@ export interface CkSurfaceProps extends CkElementProps<SkSurface> {
 
 export class CkSurface implements CkElementContainer<'ck-surface'> {
   readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-surface']['props']
   skObject?: CkObjectTyping['ck-surface']['type']
   readonly skObjectType: CkObjectTyping['ck-surface']['name'] = 'SkSurface'
   readonly type = 'ck-surface' as const
@@ -35,9 +35,11 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
   private renderPaint?: SkPaint
   deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-surface']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
+  constructor(
+    readonly context: ContainerContext,
+    readonly props: CkObjectTyping['ck-surface']['props'],
+  ) {
+    this.canvasKit = context.ckElement.canvasKit
     this.defaultPaint = new this.canvasKit.Paint()
   }
 
@@ -87,9 +89,9 @@ export class CkSurface implements CkElementContainer<'ck-surface'> {
 export const createCkSurface: CkElementCreator<'ck-surface'> = (
   type,
   props,
-  canvasKit,
+  context,
 ): CkElementContainer<'ck-surface'> => {
-  return new CkSurface(canvasKit, props)
+  return new CkSurface(context, props)
 }
 
 export function isCkSurface(ckElement: CkElement<CkElementType>): ckElement is CkSurface {

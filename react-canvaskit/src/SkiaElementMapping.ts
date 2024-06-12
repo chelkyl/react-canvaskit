@@ -11,15 +11,18 @@ import type {
 import type { CkFontStyle, Color, Font, Paint, ParagraphStyle, TextStyle, TypeFace } from './SkiaElementTypes'
 import { FontSlantEnum, FontWeightEnum, FontWidthEnum } from './SkiaElementTypes'
 
-export interface PropsConverter<IN, OUT> {
-  (canvasKit: CanvasKit, propIn?: IN): OUT | undefined
+export interface PropsConverter<IN, OUT, Extra = undefined> {
+  (canvasKit: CanvasKit, propIn?: IN, extra?: Extra): OUT | undefined
 }
 export const toSkTypeFace: PropsConverter<TypeFace, SkTypeface> = (canvasKit, typeFace) =>
   typeFace ? canvasKit.Typeface.MakeFreeTypeFaceFromData(typeFace.data) ?? undefined : undefined
-export const toSkFont: PropsConverter<Font, SkFont> = (canvasKit, font) =>
-  font
-    ? new canvasKit.Font(font.typeFace === undefined ? null : toSkTypeFace(canvasKit, font.typeFace)!, font.size)
-    : undefined
+export const toSkFont: PropsConverter<Font, SkFont, SkTypeface> = (canvasKit, font, defaultTypeface) => {
+  if (!font) return font
+  let fontTypeface: SkTypeface | null = null
+  if (font.typeFace) fontTypeface = toSkTypeFace(canvasKit, font.typeFace)!
+  else if (defaultTypeface) fontTypeface = defaultTypeface
+  return new canvasKit.Font(fontTypeface, font.size)
+}
 export const toSkColor: PropsConverter<Color | string, SkColor> = (canvasKit, color) => {
   if (typeof color === 'string') {
     return canvasKit.parseColorString(color)

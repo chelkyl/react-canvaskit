@@ -10,6 +10,7 @@ import {
   CkElementType,
   CkObjectTyping,
   Color,
+  ContainerContext,
 } from './SkiaElementTypes'
 
 export interface CkCanvasProps extends CkElementProps<SkCanvas> {
@@ -22,7 +23,6 @@ type CkCanvasChild = CkElement<'ck-surface'> | CkElement<'ck-text'>
 
 export class CkCanvas implements CkElementContainer<'ck-canvas'> {
   readonly canvasKit: CanvasKit
-  readonly props: CkObjectTyping['ck-canvas']['props']
   skObject?: CkObjectTyping['ck-canvas']['type']
   readonly skObjectType: CkObjectTyping['ck-canvas']['name'] = 'SkCanvas'
   readonly type = 'ck-canvas' as const
@@ -30,9 +30,11 @@ export class CkCanvas implements CkElementContainer<'ck-canvas'> {
 
   private deleted = false
 
-  constructor(canvasKit: CanvasKit, props: CkObjectTyping['ck-canvas']['props']) {
-    this.canvasKit = canvasKit
-    this.props = props
+  constructor(
+    readonly context: ContainerContext,
+    readonly props: CkObjectTyping['ck-canvas']['props'],
+  ) {
+    this.canvasKit = context.ckElement.canvasKit
   }
 
   render(parent: CkElementContainer<CkElementType>): void {
@@ -82,8 +84,5 @@ export function isCkCanvas(ckElement: CkElement<CkElementType>): ckElement is Ck
   return ckElement.type === 'ck-canvas'
 }
 
-export const createCkCanvas: CkElementCreator<'ck-canvas'> = (
-  type,
-  props,
-  canvasKit: CanvasKit,
-): CkElementContainer<'ck-canvas'> => new CkCanvas(canvasKit, props)
+export const createCkCanvas: CkElementCreator<'ck-canvas'> = (type, props, context): CkElementContainer<'ck-canvas'> =>
+  new CkCanvas(context, props)

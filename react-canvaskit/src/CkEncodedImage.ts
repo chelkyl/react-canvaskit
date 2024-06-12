@@ -8,6 +8,7 @@ import {
   CkElementProps,
   CkElementType,
   CkObjectTyping,
+  ContainerContext,
   Paint,
 } from './SkiaElementTypes'
 
@@ -19,6 +20,7 @@ export interface CkEncodedImageProps extends CkElementProps<never> {
 }
 
 class CkEncodedImage implements CkElement<'ck-encoded-image'> {
+  readonly canvasKit: CanvasKit
   readonly skObjectType: CkObjectTyping['ck-encoded-image']['name'] = 'SkImage'
   readonly type = 'ck-encoded-image' as const
   deleted = false
@@ -29,9 +31,10 @@ class CkEncodedImage implements CkElement<'ck-encoded-image'> {
   private image?: SkImage
 
   constructor(
-    readonly canvasKit: CanvasKit,
+    readonly context: ContainerContext,
     readonly props: CkObjectTyping['ck-encoded-image']['props'],
   ) {
+    this.canvasKit = context.ckElement.canvasKit
     this.defaultPaint = new this.canvasKit.Paint()
     this.defaultPaint.setStyle(this.canvasKit.PaintStyle.Fill)
     this.defaultPaint.setAntiAlias(true)
@@ -64,5 +67,5 @@ class CkEncodedImage implements CkElement<'ck-encoded-image'> {
   }
 }
 
-export const createCkEncodedImage: CkElementCreator<'ck-encoded-image'> = (type, props, canvasKit) =>
-  new CkEncodedImage(canvasKit, props)
+export const createCkEncodedImage: CkElementCreator<'ck-encoded-image'> = (type, props, context) =>
+  new CkEncodedImage(context, props)
